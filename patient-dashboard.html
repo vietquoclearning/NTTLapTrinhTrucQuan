@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đặt lịch khám</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="assets/css/style.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-primary">
+        <div class="container">
+            <a class="navbar-brand text-white" href="index.html">
+                <i class="fas fa-hospital me-2"></i>
+                Bệnh viện VTK
+            </a>
+            <div class="navbar-nav ms-auto">
+                <div class="nav-link text-white d-flex flex-column align-items-end">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-user me-1"></i>
+                        <span id="userName">Bệnh nhân</span>
+                    </div>
+                    <small id="patientCodeDisplay" class="text-light opacity-75" style="font-size: 0.75rem; margin-top: -2px;"></small>
+                </div>
+                <a class="nav-link text-white" href="#" id="logoutBtn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt me-1"></i>Đăng xuất
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-4">
+        <!-- Welcome Section -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="dashboard-card">
+                    <h4 class="text-primary">
+                        <i class="fas fa-user-circle me-2"></i>
+                        Chào mừng, <span id="welcomeUserName">Bệnh nhân</span>!
+                    </h4>
+                    <p class="text-muted mb-0">Quản lý lịch khám và đặt lịch mới một cách dễ dàng</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="dashboard-card text-center">
+                    <i class="fas fa-calendar-check fa-2x text-primary mb-2"></i>
+                    <h5 id="upcomingCount">0</h5>
+                    <p class="text-muted mb-0">Lịch sắp tới</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="dashboard-card text-center">
+                    <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
+                    <h5 id="completedCount">0</h5>
+                    <p class="text-muted mb-0">Đã hoàn thành</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="dashboard-card text-center">
+                    <i class="fas fa-calendar-plus fa-2x text-info mb-2"></i>
+                    <h5 id="totalCount">0</h5>
+                    <p class="text-muted mb-0">Tổng lịch khám</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="dashboard-card">
+                    <h5 class="text-primary mb-3">
+                        <i class="fas fa-tasks me-2"></i>
+                        Thao tác nhanh
+                    </h5>
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <button class="btn btn-primary w-100" onclick="showBookingForm()">
+                                <i class="fas fa-calendar-plus me-2"></i>
+                                Đặt lịch khám mới
+                            </button>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <button class="btn btn-outline-primary w-100" onclick="showAppointmentHistory()">
+                                <i class="fas fa-history me-2"></i>
+                                Xem lịch sử khám
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Upcoming Appointments -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="dashboard-card">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="text-primary mb-0">
+                            <i class="fas fa-clock me-2"></i>
+                            Lịch khám sắp tới
+                        </h5>
+                        <div class="pagination-controls" id="upcomingPagination" style="display: none;">
+                            <button class="btn btn-sm btn-outline-primary" id="upcomingPrevBtn" onclick="patientDashboard.previousUpcomingPage()">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <span class="mx-2 text-muted" id="upcomingPageInfo">1/1</span>
+                            <button class="btn btn-sm btn-outline-primary" id="upcomingNextBtn" onclick="patientDashboard.nextUpcomingPage()">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="dashboardUpcomingAppointments">
+                        <p class="text-muted text-center">Không có lịch khám sắp tới</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Appointments -->
+        <div class="row">
+            <div class="col-12">
+                <div class="dashboard-card">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="text-primary mb-0">
+                            <i class="fas fa-list me-2"></i>
+                            Lịch khám gần đây
+                        </h5>
+                        <div class="pagination-controls" id="recentPagination" style="display: none;">
+                            <button class="btn btn-sm btn-outline-primary" id="recentPrevBtn" onclick="patientDashboard.previousRecentPage()">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <span class="mx-2 text-muted" id="recentPageInfo">1/1</span>
+                            <button class="btn btn-sm btn-outline-primary" id="recentNextBtn" onclick="patientDashboard.nextRecentPage()">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="dashboardRecentAppointments">
+                        <p class="text-muted text-center">Không có lịch khám gần đây</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Booking Form Modal -->
+    <div class="modal fade" id="bookingModal" tabindex="-1">
+        <div class="modal-dialog modal-lg booking-modal">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title text-white">
+                        <i class="fas fa-calendar-plus me-2"></i>
+                        Đặt lịch khám
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                
+                <!-- Progress Steps - Fixed at top -->
+                <div class="modal-header bg-light">
+                    <div class="progress-steps w-100 horizontal-layout">
+                        <div class="progress-step">
+                            <div class="step-number active" id="step1">1</div>
+                            <div class="step-label">Chuyên khoa</div>
+                        </div>
+                        <div class="progress-step">
+                            <div class="step-number" id="step2">2</div>
+                            <div class="step-label">Bác sĩ</div>
+                        </div>
+                        <div class="progress-step">
+                            <div class="step-number" id="step3">3</div>
+                            <div class="step-label">Ngày & giờ</div>
+                        </div>
+                        <div class="progress-step">
+                            <div class="step-number" id="step4">4</div>
+                            <div class="step-label">Xác nhận</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Modal Body - Dynamic height with scroll -->
+                <div class="modal-body">
+                    <!-- Step 1: Choose Specialty -->
+                    <div id="step1Content">
+                        <h6 class="mb-3">Chọn chuyên khoa</h6>
+                        <div class="row" id="specialtyList">
+                            <!-- Specialties will be loaded here -->
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Choose Doctor -->
+                    <div id="step2Content" style="display: none;">
+                        <h6 class="mb-3">Chọn bác sĩ</h6>
+                        <div class="row" id="doctorList">
+                            <!-- Doctors will be loaded here -->
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Choose Date & Time -->
+                    <div id="step3Content" style="display: none;">
+                        <h6 class="mb-3">Chọn ngày và giờ khám</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Chọn ngày</h6>
+                                <div id="calendarContainer">
+                                    <!-- Calendar will be loaded here -->
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Chọn giờ</h6>
+                                <div id="timeSlotsContainer">
+                                    <p class="text-muted">Vui lòng chọn bác sĩ và ngày trước</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 4: Confirmation -->
+                    <div id="step4Content" style="display: none;">
+                        <h6 class="mb-3">Xác nhận thông tin</h6>
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <p><strong>Bệnh viện:</strong> <span id="confirmHospital">Bệnh viện VTK</span></p>
+                                        <p><strong>Chuyên khoa:</strong> <span id="confirmSpecialty"></span></p>
+                                        <p><strong>Bác sĩ:</strong> <span id="confirmDoctor"></span></p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p><strong>Ngày khám:</strong> <span id="confirmDate"></span></p>
+                                        <p><strong>Giờ khám:</strong> <span id="confirmTime"></span></p>
+                                    </div>
+                                </div>
+                                <!-- Reschedule Info (hidden by default) -->
+                                <div id="rescheduleInfo" style="display: none;"></div>
+                                
+                                <div class="mb-3">
+                                    <label for="appointmentNotes" class="form-label">Ghi chú (tùy chọn)</label>
+                                    <textarea class="form-control" id="appointmentNotes" rows="2" placeholder="Mô tả triệu chứng hoặc lý do khám..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+                
+                <!-- Modal Footer - Fixed at bottom -->
+                <div class="modal-footer bg-light border-top">
+                    <div class="d-flex justify-content-between w-100 align-items-center">
+                        <button type="button" class="btn btn-secondary" id="prevBtn" style="display: none;">
+                            <i class="fas fa-arrow-left me-1"></i>Quay lại
+                        </button>
+                        <div class="ms-auto">
+                            <button type="button" class="btn btn-primary" id="nextBtn">
+                                Tiếp theo<i class="fas fa-arrow-right ms-1"></i>
+                            </button>
+                            <button type="button" class="btn btn-success" id="confirmBtn" style="display: none;">
+                                <i class="fas fa-check me-1"></i>Xác nhận đặt lịch
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Appointment History Modal -->
+    <div class="modal fade" id="historyModal" tabindex="-1">
+        <div class="modal-dialog modal-lg history-modal">
+            <div class="modal-content">
+                <!-- Fixed Header -->
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">
+                        <i class="fas fa-history me-2"></i>
+                        Lịch sử khám bệnh
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                
+                <!-- Fixed Tab Navigation -->
+                <div class="modal-header bg-light border-bottom">
+                    <ul class="nav nav-tabs w-100" id="historyTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="upcoming-tab" data-bs-toggle="tab" data-bs-target="#upcoming" type="button" role="tab">
+                                <i class="fas fa-clock me-1"></i>Sắp và đang diễn ra
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="completed-tab" data-bs-toggle="tab" data-bs-target="#completed" type="button" role="tab">
+                                <i class="fas fa-check-circle me-1"></i>Đã diễn ra
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="cancelled-tab" data-bs-toggle="tab" data-bs-target="#cancelled" type="button" role="tab">
+                                <i class="fas fa-times-circle me-1"></i>Đã hủy
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- Scrollable Content -->
+                <div class="modal-body">
+                    <!-- Tab Content -->
+                    <div class="tab-content" id="historyTabContent">
+                        <!-- Upcoming & Ongoing Tab -->
+                        <div class="tab-pane fade show active" id="upcoming" role="tabpanel">
+                            <div id="upcomingAppointments">
+                                <!-- Upcoming appointments will be loaded here -->
+                            </div>
+                        </div>
+                        
+                        <!-- Completed Tab -->
+                        <div class="tab-pane fade" id="completed" role="tabpanel">
+                            <div id="completedAppointments">
+                                <!-- Completed appointments will be loaded here -->
+                            </div>
+                        </div>
+                        
+                        <!-- Cancelled Tab -->
+                        <div class="tab-pane fade" id="cancelled" role="tabpanel">
+                            <div id="cancelledAppointments">
+                                <!-- Cancelled appointments will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Review Modal -->
+    <div class="modal fade" id="reviewModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title">
+                        <i class="fas fa-star me-2"></i>
+                        Đánh giá cuộc hẹn
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="reviewForm">
+                        <input type="hidden" id="reviewAppointmentId">
+                        <div class="mb-3">
+                            <label class="form-label">Đánh giá</label>
+                            <div class="rating-stars">
+                                <i class="fas fa-star star" data-rating="1"></i>
+                                <i class="fas fa-star star" data-rating="2"></i>
+                                <i class="fas fa-star star" data-rating="3"></i>
+                                <i class="fas fa-star star" data-rating="4"></i>
+                                <i class="fas fa-star star" data-rating="5"></i>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="reviewText" class="form-label">Nhận xét</label>
+                            <textarea class="form-control" id="reviewText" rows="3" placeholder="Chia sẻ trải nghiệm của bạn..."></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-warning" onclick="submitReview()">
+                        <i class="fas fa-paper-plane me-1"></i>Gửi đánh giá
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/app.js"></script>
+    <script src="assets/js/patient-dashboard.js"></script>
+    
+    <!-- Initialize dashboard -->
+    <script>
+        // Wait for DOM to be ready
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM ready, initializing patient dashboard...');
+            // Small delay to ensure all scripts are loaded
+            setTimeout(function() {
+                initializePatientDashboard();
+            }, 100);
+        });
+    </script>
+</body>
+</html> 

@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Quản lý - Hệ thống Đặt Lịch Khám Bệnh</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="assets/css/style.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-primary">
+        <div class="container">
+            <a class="navbar-brand text-white" href="index.html">
+                <i class="fas fa-hospital me-2"></i>
+                Bệnh viện VTK
+            </a>
+            <div class="navbar-nav ms-auto">
+                <span class="nav-link text-white">
+                    <i class="fas fa-user-shield me-1"></i>
+                    <span id="userName">Quản lý</span>
+                </span>
+                <a class="nav-link text-white" href="#" id="logoutBtn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt me-1"></i>Đăng xuất
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-4">
+        <!-- Welcome Section -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="dashboard-card">
+                    <h4 class="text-primary">
+                        <i class="fas fa-user-shield me-2"></i>
+                        Chào mừng, <span id="welcomeUserName">Quản lý</span>!
+                    </h4>
+                    <p class="text-muted mb-0">Quản lý tổng thể hệ thống đặt lịch khám bệnh</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="dashboard-card text-center">
+                    <i class="fas fa-users fa-2x text-info mb-2"></i>
+                    <h5 id="totalPatients">0</h5>
+                    <p class="text-muted mb-0">Tổng bệnh nhân</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="dashboard-card text-center">
+                    <i class="fas fa-user-md fa-2x text-warning mb-2"></i>
+                    <h5 id="totalDoctors">0</h5>
+                    <p class="text-muted mb-0">Tổng bác sĩ</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="dashboard-card text-center">
+                    <i class="fas fa-chart-line fa-2x text-danger mb-2"></i>
+                    <h5 id="totalAppointments">0</h5>
+                    <p class="text-muted mb-0">Tổng lịch khám</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Management Actions -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="dashboard-card">
+                    <h5 class="text-primary mb-3">
+                        <i class="fas fa-cogs me-2"></i>
+                        Quản lý hệ thống
+                    </h5>
+                    <div class="row">
+                        <div class="col-md-3 mb-2">
+                            <button class="btn btn-info w-100" onclick="showUserManagement()">
+                                <i class="fas fa-users me-2"></i>
+                                Quản lý người dùng
+                            </button>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <button class="btn btn-warning w-100" onclick="showSpecialtyManagement()">
+                                <i class="fas fa-stethoscope me-2"></i>
+                                Quản lý chuyên khoa
+                            </button>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <button class="btn btn-secondary w-100" onclick="resetAppointmentData()">
+                                <i class="fas fa-refresh me-2"></i>
+                                Reset dữ liệu
+                            </button>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <button class="btn btn-info w-100" onclick="debugData()">
+                                <i class="fas fa-bug me-2"></i>
+                                Debug dữ liệu
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- All Appointments Modal -->
+    <div class="modal fade" id="allAppointmentsModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">
+                        <i class="fas fa-list me-2"></i>
+                        Tất cả lịch khám
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <input type="date" class="form-control" id="filterDate" onchange="filterAppointments()">
+                        </div>
+                        <div class="col-md-4">
+                            <select class="form-select" id="filterStatus" onchange="filterAppointments()">
+                                <option value="">Tất cả trạng thái</option>
+                                <option value="upcoming">Sắp tới</option>
+                                <option value="completed">Đã hoàn thành</option>
+                                <option value="cancelled">Đã hủy</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <select class="form-select" id="filterSpecialty" onchange="filterAppointments()">
+                                <option value="">Tất cả chuyên khoa</option>
+                                <!-- Specialties will be loaded here -->
+                            </select>
+                        </div>
+                    </div>
+                    <div id="allAppointmentsList">
+                        <!-- Appointments will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Management Modal -->
+    <div class="modal fade" id="userManagementModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-info text-white">
+                    <h5 class="modal-title">
+                        <i class="fas fa-users me-2"></i>
+                        Quản lý người dùng
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <button class="btn btn-success" onclick="showAddUserForm()">
+                            <i class="fas fa-plus me-1"></i>Thêm người dùng mới
+                        </button>
+                    </div>
+                    <div id="userList">
+                        <!-- Users will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add User Modal -->
+    <div class="modal fade" id="addUserModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">
+                        <i class="fas fa-user-plus me-2"></i>
+                        Thêm người dùng mới
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addUserForm">
+                        <div class="mb-3">
+                            <label for="newUserName" class="form-label">Họ và tên</label>
+                            <input type="text" class="form-control" id="newUserName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="newUserEmail" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="newUserEmail" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="newUserPhone" class="form-label">Số điện thoại</label>
+                            <input type="tel" class="form-control" id="newUserPhone" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="newUserRole" class="form-label">Vai trò</label>
+                            <select class="form-select" id="newUserRole" required>
+                                <option value="">Chọn vai trò</option>
+                                <option value="patient">Bệnh nhân</option>
+                                <option value="doctor">Bác sĩ</option>
+                                <option value="admin">Quản lý</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="newUserPassword" class="form-label">Mật khẩu</label>
+                            <div class="password-input-container">
+                                <input type="password" class="form-control" id="newUserPassword" required>
+                                <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('newUserPassword')">
+                                    <i class="fas fa-eye" id="newUserPasswordIcon"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-success" onclick="addNewUser()">
+                        <i class="fas fa-save me-1"></i>Thêm người dùng
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hospital Management Modal -->
+    <div class="modal fade" id="hospitalManagementModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">
+                        <i class="fas fa-hospital me-2"></i>
+                        Quản lý bệnh viện
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <button class="btn btn-success" onclick="showAddHospitalForm()">
+                            <i class="fas fa-plus me-2"></i>
+                            Thêm bệnh viện mới
+                        </button>
+                    </div>
+                    <div id="hospitalList">
+                        <!-- Hospital list will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Specialty Management Modal -->
+    <div class="modal fade" id="specialtyManagementModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-white">
+                    <h5 class="modal-title">
+                        <i class="fas fa-stethoscope me-2"></i>
+                        Quản lý chuyên khoa
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <button class="btn btn-success" onclick="showAddSpecialtyForm()">
+                            <i class="fas fa-plus me-1"></i>Thêm chuyên khoa mới
+                        </button>
+                    </div>
+                    <div id="specialtyList">
+                        <!-- Specialties will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Specialty Modal -->
+    <div class="modal fade" id="addSpecialtyModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="addSpecialtyModalTitle">
+                        <i class="fas fa-plus me-2"></i>
+                        Thêm chuyên khoa mới
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addSpecialtyForm">
+                        <input type="hidden" id="specialtyId" value="">
+                        <div class="mb-3">
+                            <label for="specialtyName" class="form-label">Tên chuyên khoa</label>
+                            <input type="text" class="form-control" id="specialtyName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="specialtyIcon" class="form-label">Icon (Font Awesome class)</label>
+                            <input type="text" class="form-control" id="specialtyIcon" placeholder="fas fa-heartbeat" required>
+                            <div class="form-text">Ví dụ: fas fa-heartbeat, fas fa-stethoscope, fas fa-user-md</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="specialtyDescription" class="form-label">Mô tả</label>
+                            <textarea class="form-control" id="specialtyDescription" rows="3" required></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-success" onclick="saveSpecialty()">
+                        <i class="fas fa-save me-1"></i>Lưu
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/app.js"></script>
+    <script src="assets/js/admin-dashboard.js"></script>
+</body>
+</html> 

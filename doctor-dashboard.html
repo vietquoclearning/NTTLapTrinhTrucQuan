@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Bác sĩ - Hệ thống Đặt Lịch Khám Bệnh</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="assets/css/style.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-primary">
+        <div class="container">
+            <a class="navbar-brand text-white" href="index.html">
+                <i class="fas fa-hospital me-2"></i>
+                Bệnh viện VTK
+            </a>
+            <div class="navbar-nav ms-auto">
+                <span class="nav-link text-white">
+                    <i class="fas fa-user-md me-1"></i>
+                    <span id="userName">Bác sĩ</span>
+                </span>
+                <a class="nav-link text-white" href="#" id="logoutBtn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt me-1"></i>Đăng xuất
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-4">
+        <!-- Welcome Section -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="dashboard-card">
+                    <h4 class="text-primary">
+                        <i class="fas fa-user-md me-2"></i>
+                        Chào mừng, <span id="welcomeUserName">Bác sĩ</span>!
+                    </h4>
+                    <p class="text-muted mb-0">Bệnh viện: <strong>Bệnh viện VTK</strong></p>
+                    <p class="text-muted mb-0">Quản lý lịch khám và theo dõi bệnh nhân</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="dashboard-card text-center">
+                    <i class="fas fa-calendar-day fa-2x text-primary mb-2"></i>
+                    <h5 id="todayCount">0</h5>
+                    <p class="text-muted mb-0">Hôm nay</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="dashboard-card text-center">
+                    <i class="fas fa-calendar-week fa-2x text-info mb-2"></i>
+                    <h5 id="weekCount">0</h5>
+                    <p class="text-muted mb-0">Tuần này</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="dashboard-card text-center">
+                    <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
+                    <h5 id="completedCount">0</h5>
+                    <p class="text-muted mb-0">Đã hoàn thành</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="dashboard-card text-center">
+                    <i class="fas fa-users fa-2x text-warning mb-2"></i>
+                    <h5 id="totalPatients">0</h5>
+                    <p class="text-muted mb-0">Tổng bệnh nhân</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Date Filter -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="dashboard-card">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <h5 class="text-primary mb-0" id="appointmentsTitle">
+                                <i class="fas fa-calendar-alt me-2"></i>
+                                Lịch khám theo ngày
+                            </h5>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex gap-2">
+                                <input type="date" class="form-control" id="dateFilter" onchange="filterByDate()">
+                                <button class="btn btn-outline-primary" onclick="showToday()">
+                                    <i class="fas fa-calendar-day me-1"></i>Hôm nay
+                                </button>
+                                <button class="btn btn-outline-primary btn-tomorrow" onclick="showTomorrow()">
+                                    <i class="fas fa-calendar-plus me-1"></i>Ngày mai
+                                </button>
+                                <button class="btn btn-outline-info" onclick="showAllAppointments()">
+                                    <i class="fas fa-list me-1"></i>Tất cả
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Appointments List -->
+        <div class="row">
+            <div class="col-12">
+                <div class="dashboard-card">
+                    <h5 class="text-primary mb-3">
+                        <i class="fas fa-list me-2"></i>
+                        Danh sách lịch khám
+                    </h5>
+                    <div id="appointmentsList">
+                        <p class="text-muted text-center">Không có lịch khám nào</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Appointment Detail Modal -->
+    <div class="modal fade" id="appointmentDetailModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">
+                        <i class="fas fa-user me-2"></i>
+                        Chi tiết lịch khám
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="appointmentDetail">
+                        <!-- Appointment details will be loaded here -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                    <button type="button" class="btn btn-success" id="completeAppointmentBtn">
+                        <i class="fas fa-check me-1"></i>Hoàn thành
+                    </button>
+                    <button type="button" class="btn btn-warning" id="rescheduleAppointmentBtn">
+                        <i class="fas fa-clock me-1"></i>Đổi lịch
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reschedule Modal -->
+    <div class="modal fade" id="rescheduleModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title">
+                        <i class="fas fa-clock me-2"></i>
+                        Đổi lịch khám
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="rescheduleForm">
+                        <input type="hidden" id="rescheduleAppointmentId">
+                        <div class="mb-3">
+                            <label for="newDate" class="form-label">Ngày mới</label>
+                            <input type="date" class="form-control" id="newDate" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="newTime" class="form-label">Giờ mới</label>
+                            <select class="form-select" id="newTime" required>
+                                <option value="">Chọn giờ</option>
+                                <option value="08:00">08:00</option>
+                                <option value="08:30">08:30</option>
+                                <option value="09:00">09:00</option>
+                                <option value="09:30">09:30</option>
+                                <option value="10:00">10:00</option>
+                                <option value="10:30">10:30</option>
+                                <option value="14:00">14:00</option>
+                                <option value="14:30">14:30</option>
+                                <option value="15:00">15:00</option>
+                                <option value="15:30">15:30</option>
+                                <option value="16:00">16:00</option>
+                                <option value="16:30">16:30</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="rescheduleReason" class="form-label">Lý do đổi lịch</label>
+                            <textarea class="form-control" id="rescheduleReason" rows="3" placeholder="Nhập lý do đổi lịch..."></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-warning" onclick="confirmReschedule()">
+                        <i class="fas fa-save me-1"></i>Lưu thay đổi
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/app.js"></script>
+    <script src="assets/js/doctor-dashboard.js"></script>
+</body>
+</html> 
